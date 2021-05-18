@@ -6,21 +6,53 @@ import Show from './../Show';
 
 const testShow = {
     //add in approprate test data structure here.
+    name: 'The Cosby Show',
+    image: 'https://m.media-amazon.com/images/M/MV5BN2VhZjA4ZGMtMTM0ZC00MTIyLWFjMzMtOWI4Y2JjN2IyNmYyXkEyXkFqcGdeQXVyNjc4NTExMTk@._V1_UY1200_CR93,0,630,1200_AL_.jpg',
+    summary: 'summary of the awesome show!',
+    seasons: [
+        {id:0, name: "Season 1", episodes: []}, 
+        {id:1, name: "Season 2", episodes: []}, 
+        {id:2, name: "Season 3", episodes: []}, 
+        {id:3, name: "Season 4", episodes: []}
+      ]
 }
 
 test('renders testShow and no selected Season without errors', ()=>{
+    render(<Show  show={testShow} selectedSeason={"none"} />)
 });
 
 test('renders Loading component when prop show is null', () => {
+    render(<Show show={null} selectedSeason={"none"}/>)
+    const loading = screen.queryByTestId('loading-container')
+    expect(loading).toBeInTheDocument();
 });
 
 test('renders same number of options seasons are passed in', ()=>{
+    render(<Show show={testShow} selectedSeason={'none'} />)
+    const seasonOptions = screen.queryAllByTestId('season-option')
+    expect(seasonOptions).toHaveLength(4)
+
 });
 
 test('handleSelect is called when an season is selected', () => {
+    const mockSeasonSelect = jest.fn();
+
+    render(<Show handleSelect={mockSeasonSelect} show={testShow} selectedSeason={'none'}/>)
+    userEvent.selectOptions(screen.getByLabelText("Select A Season"), ['1']);
+    expect(mockSeasonSelect).toHaveBeenCalled();
 });
 
 test('component renders when no seasons are selected and when rerenders with a season passed in', () => {
+    const mockSeasonSelect = jest.fn();
+
+    const {rerender} = render(<Show handleSelect={mockSeasonSelect} show={testShow} selectedSeason={'none'} />)
+    let episodes = screen.queryByTestId('episodes-container')
+    expect(episodes).not.toBeInTheDocument();
+
+    
+    rerender(<Show handleSelect={mockSeasonSelect} show={testShow} selectedSeason={2} />)
+    episodes = screen.queryByTestId('episodes-container')
+    expect(episodes).toBeInTheDocument();
 });
 
 //Tasks:
